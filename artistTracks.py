@@ -170,7 +170,7 @@ dfFinal = df.sort_values('popularity', ascending=False).drop_duplicates('name').
 # Save to csv
 artist = '_'.join(sys.argv[1:])       # For running individually in command line
 artist = '_'.join(artist.split())     # For running in shell loop
-outputFileName = './output/' + artist + '_data.csv'
+outputFileName = './data/' + artist + '_data.csv'
 dfFinal.to_csv(outputFileName)
 print()
 print('Information about ' + name + '\'s music output to ' + outputFileName + '.')

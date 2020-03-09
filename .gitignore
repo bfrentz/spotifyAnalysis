@@ -1,1 +1,3 @@
 *.csv
+.cache-128455376
+.ipynb_checkpoints/
