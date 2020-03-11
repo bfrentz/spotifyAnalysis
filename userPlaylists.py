@@ -23,7 +23,7 @@ if __name__ == '__main__':
 		#print('Whoops, need to provide your username 	when calling this function!')
 		#print('\nUsage: python3 userPlaylists.py [	username]')
 		#sys.exit()
-		print('Using default username for Bryce Frentz')
+		print('Using default username for Bryce Frentz\n')
 		username = '128455376'
 
 	# Get oauth token
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 		for playlist in playlists['items']:
 			print(playlist['name'])
 
-		listContents = True
+		listContents = False
 		examine = True
 		while examine:
 			prompt = input('\nWould you like to see the contents of one of these playlists? (0 = No, 1 = Yes)\n')
@@ -63,6 +63,11 @@ if __name__ == '__main__':
 						while tracks['next']:
 							tracks = sp.next(tracks)
 							showTracks(tracks)
+
+						listContents = True
+
+				if not listContents:
+					print('\nThere is no playlist by that name.\nPlease try again.\n')
 
 			elif prompt == '0':
 				examine = False
