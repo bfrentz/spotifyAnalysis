@@ -47,6 +47,42 @@ def getPlaylistSongs(playlist):
 	return song_ids
 
 
+# Get the audio features for a track
+def audioFeatures(trackID):
+	"""
+	Function gets the audio features for a given track
+	Descriptions of the different features can be found here:
+	https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
+
+	Inputs: spotify song ID
+	Output: dictionary containing audio features:
+	'acousticness'
+    'danceability'
+    'energy'
+    'instrumentalness'
+    'liveness'
+    'loudness'
+    'speechiness'
+    'tempo'
+    'valence'
+    'popularity'
+
+    """
+
+	# Store the audio features
+	features = sp.audio_features(trackID)
+	#DEBUG
+	#print(features)
+
+	# Since popularity for a track is stored in a different spot, get that
+	pop = sp.track(trackID)
+	features[0]['popularity'] = pop['popularity']
+	#DEBUG
+	#print(features)
+
+	return features
+
+
 # Accessing spotify
 # Use your own credentials!
 #client_id = ""
@@ -69,5 +105,12 @@ results = sp.playlist(playlistID)
 #print(results.keys())
 #print(results['tracks']['items'][0]['track']['id'])
 
+# Song ids
+songs = getPlaylistSongs(results)
+# DEBUG
+#print(songs[0])
 
-getPlaylistSongs(results)
+# test audioFeatures
+trackFeatures = audioFeatures(songs[0])
+#DEBUG
+#print(trackFeatures)
