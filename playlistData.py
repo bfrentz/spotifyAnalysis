@@ -16,6 +16,37 @@ import io
 import json
 
 
+# Get the id's for every song in the playlist
+def getPlaylistSongs(playlist):
+
+	# Song id's
+	song_ids = []
+
+	# How many songs?
+	print('total tracks in playlist: ' + str(playlist['tracks']['total']))
+
+	# Since we can only access 100 at a time, work around it like this by copying the data to new lists
+	tracks = playlist['tracks']
+	songs = tracks['items']
+	while tracks['next']:
+		# iterate over playlist
+		tracks = sp.next(tracks)
+
+		for item in tracks['items']:
+			songs.append(item)
+
+	# Get ids
+	for i in range(len(songs)):
+		# DEBUG
+		#print('Added song number ', i, ' from playlist.')
+		song_ids.append(songs[i]['track']['id'])
+
+	# DEBUG
+	#print(song_ids)
+
+	return song_ids
+
+
 # Accessing spotify
 # Use your own credentials!
 #client_id = ""
@@ -28,9 +59,15 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # Playlist URI
 playlistID = 'spotify:playlist:1M7TwHy1FRPtUh1CIEvyqS'
+
+# Get playlist json data
 results = sp.playlist(playlistID)
 
 # DEBUG
 # Print playlist information
 #print(json.dumps(results, indent=4))
-print(results.keys())
+#print(results.keys())
+#print(results['tracks']['items'][0]['track']['id'])
+
+
+getPlaylistSongs(results)
