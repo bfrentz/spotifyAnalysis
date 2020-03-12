@@ -21,6 +21,8 @@ def getPlaylistSongs(playlist):
 
 	# Song id's
 	song_ids = []
+	song_names = []
+	song_artists = []
 
 	# How many songs?
 	print('total tracks in playlist: ' + str(playlist['tracks']['total']))
@@ -40,11 +42,16 @@ def getPlaylistSongs(playlist):
 		# DEBUG
 		#print('Added song number ', i, ' from playlist.')
 		song_ids.append(songs[i]['track']['id'])
+		song_names.append(songs[i]['track']['name'])
+		song_artists.append(songs[i]['track']['artists'][0]['name'])
 
 	# DEBUG
 	#print(song_ids)
-
-	return song_ids
+	contents = {}
+	contents['song_id'] = song_ids
+	contents['title'] = song_names
+	contents['artist'] = song_artists
+	return contents
 
 
 # Get the audio features for a track
@@ -76,7 +83,7 @@ def audioFeatures(trackID):
 
 	# Since popularity for a track is stored in a different spot, get that
 	pop = sp.track(trackID)
-	features[0]['popularity'] = pop['popularity']
+	features[0]['trackPopularity'] = pop['popularity']
 	#DEBUG
 	#print(features)
 
@@ -101,16 +108,102 @@ results = sp.playlist(playlistID)
 
 # DEBUG
 # Print playlist information
+print(results['name'])
 #print(json.dumps(results, indent=4))
-#print(results.keys())
-#print(results['tracks']['items'][0]['track']['id'])
+#print(results['tracks']['items'][0]['track']['artists'][0]['name'])
+#print(results['tracks']['items'][0]['track']['name'])
+#print(results['tracks']['items'][0]['track'].keys())
 
 # Song ids
 songs = getPlaylistSongs(results)
 # DEBUG
-#print(songs[0])
+#print(songs['artist'][0])
 
-# test audioFeatures
-trackFeatures = audioFeatures(songs[0])
-#DEBUG
-#print(trackFeatures)
+# Get all features with audioFeatures function
+# Introduce a random delay to avoid sending too many requests to spotify's api
+trackFeatures = {}
+requestCount = 0
+startTime = time.time()
+sleepMin = 3
+sleepMax = 7
+
+acousticness = []
+danceability = []
+duration = []
+energy = []
+instrumentalness = []
+liveness = []
+loudness = []
+popularity = []
+speechiness = []
+tempo = []
+timeSignature = []
+valence = []
+
+for songID in range(len(songs['song_id'])):
+
+	# Get features
+    singleFeatures = audioFeatures(songs['song_id'][songID])
+
+    # append features
+    acousticness.append(singleFeatures[0]['acousticness'])
+    danceability.append(singleFeatures[0]['danceability'])
+    duration.append(singleFeatures[0]['duration_ms'])
+    energy.append(singleFeatures[0]['energy'])
+    instrumentalness.append(singleFeatures[0]['instrumentalness'])
+    liveness.append(singleFeatures[0]['liveness'])
+    loudness.append(singleFeatures[0]['loudness'])
+    popularity.append(singleFeatures[0]['trackPopularity'])
+    speechiness.append(singleFeatures[0]['speechiness'])
+    tempo.append(singleFeatures[0]['tempo'])
+    timeSignature.append(singleFeatures[0]['time_signature'])
+    valence.append(singleFeatures[0]['valence'])
+
+    #trackFeatures.append(singleFeatures)
+    requestCount += 1
+    if requestCount % 5 == 0:
+        print(str(requestCount) + ' songs completed.')
+        time.sleep(np.random.uniform(sleepMin, sleepMax))
+        print('Loop #: {}'.format(requestCount))
+        print('Elapsed time: {} seconds'.format(time.time() - startTime))
+
+
+# Create dictionary
+songs['acousticness'] = acousticness
+songs['danceability'] = danceability
+songs['duration'] = duration
+songs['energy'] = energy
+songs['instrumentalness'] = instrumentalness
+songs['liveness'] = liveness
+songs['loudness'] = loudness
+songs['popularity'] = popularity
+songs['speechiness'] = speechiness
+songs['tempo'] = tempo
+songs['timeSignature'] = timeSignature
+songs['valence'] = valence
+
+# DEBUG
+print()
+print()
+#print(songs)
+
+# Save as pandas dataframe
+df = pd.DataFrame.from_dict(songs)
+# DEBUG
+print(df)
+
+# Remove Duplicates
+print(len(df))
+#dfFinal = df.sort_values('popularity', ascending=False).drop_duplicates('title').sort_index()
+#print(len(dfFinal))
+#print()
+#print(dfFinal)
+
+# Write out
+name = '_'.join(results['name'].split()) # replace spaces with underscores
+name = name.replace(',', '') # removes commas
+outputFileName = './data/playlists/' + name + '_data.csv'
+df.to_csv(outputFileName)
+print()
+print('Information about ' + name + 'playlist\'s music output to ' + outputFileName + '.')
+print()
