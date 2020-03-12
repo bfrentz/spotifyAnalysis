@@ -80,6 +80,7 @@ def audioFeatures(trackID):
 	features = sp.audio_features(trackID)
 	#DEBUG
 	#print(features)
+	#print(type(features[0]['tempo']))
 
 	# Since popularity for a track is stored in a different spot, get that
 	pop = sp.track(trackID)
@@ -101,14 +102,21 @@ client_credentials_manager = SpotifyClientCredentials()
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # Playlist URI
-playlistID = 'spotify:playlist:1M7TwHy1FRPtUh1CIEvyqS'
+if len(sys.argv) > 1:
+    playlistID = sys.argv[1]
+else:
+    #print('Whoops, need to provide your username 	when calling this function!')
+    #print('\nUsage: python3 userPlaylists.py [	username]')
+    #sys.exit()
+    print('Using default playlist.\n')
+    playlistID = 'spotify:playlist:1M7TwHy1FRPtUh1CIEvyqS'
 
 # Get playlist json data
 results = sp.playlist(playlistID)
 
 # DEBUG
 # Print playlist information
-print(results['name'])
+print('Playlist: ', results['name'])
 #print(json.dumps(results, indent=4))
 #print(results['tracks']['items'][0]['track']['artists'][0]['name'])
 #print(results['tracks']['items'][0]['track']['name'])
@@ -116,6 +124,7 @@ print(results['name'])
 
 # Song ids
 songs = getPlaylistSongs(results)
+print()
 # DEBUG
 #print(songs['artist'][0])
 
@@ -142,7 +151,7 @@ valence = []
 
 for songID in range(len(songs['song_id'])):
 
-	# Get features
+    # Get features
     singleFeatures = audioFeatures(songs['song_id'][songID])
 
     # append features
@@ -167,6 +176,11 @@ for songID in range(len(songs['song_id'])):
         print('Loop #: {}'.format(requestCount))
         print('Elapsed time: {} seconds'.format(time.time() - startTime))
 
+# Normalized tempo
+maxTempo = 0
+for time in tempo:
+	if time > maxTempo:
+		maxTempo = time
 
 # Create dictionary
 songs['acousticness'] = acousticness
@@ -179,8 +193,10 @@ songs['loudness'] = loudness
 songs['popularity'] = popularity
 songs['speechiness'] = speechiness
 songs['tempo'] = tempo
+songs['tempoNormalized'] = [x/maxTempo for x in tempo]
 songs['timeSignature'] = timeSignature
 songs['valence'] = valence
+
 
 # DEBUG
 print()
@@ -205,5 +221,5 @@ name = name.replace(',', '') # removes commas
 outputFileName = './data/playlists/' + name + '_data.csv'
 df.to_csv(outputFileName)
 print()
-print('Information about ' + name + 'playlist\'s music output to ' + outputFileName + '.')
+print('Information about ' + name + ' playlist\'s music output to ' + outputFileName + '.')
 print()
