@@ -1,6 +1,6 @@
 #!/bin/bash
 
-input="./output/artists.txt"
+input="./data/artists/artists.txt"
 
 while IFS= read -r line
 do
