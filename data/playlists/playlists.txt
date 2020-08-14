@@ -20,3 +20,5 @@ spotify:playlist:2IIvlIbX2y2nVc6ErtIVaq
 spotify:playlist:1Ff5SQILy9wrxYNYlzzmWz
 spotify:playlist:4uI6Npvs4MxM3PudVhx7m3
 spotify:playlist:37i9dQZF1DXaMu9xyX1HzK
+spotify:playlist:0bxLQIld53SoEBbC6mpV8F
+spotify:playlist:37i9dQZEVXcGznKGpL9tJZ
